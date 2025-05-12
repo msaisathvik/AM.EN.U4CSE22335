@@ -1,10 +1,14 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL,
-});
-
-export const fetchStockData = async (ticker, minutes) => {
-  const res = await api.get(`/stocks/${ticker}?minutes=${minutes}&aggregation=average`);
-  return res.data;
-};
+function fetchStockData(ticker, minutes) {
+  axios
+    .get(`http://localhost:5000/stocks/${ticker}?minutes=${minutes}&aggregation=average`)
+    .then((response) => {
+      // Handle the response data
+      console.log(response.data);
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error('Error fetching stock data:', error);
+    });
+}

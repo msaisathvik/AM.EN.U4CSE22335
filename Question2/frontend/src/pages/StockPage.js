@@ -1,35 +1,43 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Container, Typography, CircularProgress } from '@mui/material';
-import TimeSelector from '../components/TimeSelector';
 import StockChart from '../components/StockChart';
-import { fetchStockData } from '../api/stockService';
 
-export default function StockPage() {
-  const [minutes, setMinutes] = useState(30);
-  const [stockData, setStockData] = useState(null);
-  const ticker = "NVDA"; // default for now
+const StockPage = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const ticker = 'AAPL'; // Example ticker
+  const minutes = 30;
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const res = await fetchStockData(ticker, minutes);
-        setStockData(res);
-      } catch (err) {
-        console.error("Failed to fetch stock data", err);
-      }
-    }
-    loadData();
-  }, [minutes]);
+    axios
+      .get(`/stocks/${ticker}?minutes=${minutes}&aggregation=average`)
+      .then((response) => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch stock data:', error);
+        setLoading(false);
+      });
+  }, [ticker, minutes]);
+
+  if (loading) {
+    return (
+      <Container>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container>
-      <Typography variant="h4" mt={2}>Stock Price Aggregator</Typography>
-      <TimeSelector minutes={minutes} setMinutes={setMinutes} />
-      {stockData ? (
-        <StockChart data={stockData.priceHistory} average={stockData.averageStockPrice} />
-      ) : (
-        <CircularProgress />
-      )}
+      <Typography variant="h4" gutterBottom>
+        {ticker} Stock Price - Last {minutes} Minutes
+      </Typography>
+      <StockChart data={data.priceHistory} average={data.averageStockPrice} />
     </Container>
   );
-}
+};
+
+export default StockPage;

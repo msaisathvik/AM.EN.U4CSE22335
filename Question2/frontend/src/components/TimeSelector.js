@@ -1,18 +1,34 @@
-import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import * as React from 'react';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
-export default function TimeSelector({ minutes, setMinutes }) {
+function TimeSelector({ onIntervalChange }) {
+  const [interval, setInterval] = React.useState(5);
+
+  const handleChange = (event) => {
+    const newInterval = event.target.value;
+    setInterval(newInterval);
+    if (onIntervalChange) {
+      onIntervalChange(newInterval);
+    }
+  };
+
   return (
     <FormControl fullWidth>
-      <InputLabel>Time Interval (minutes)</InputLabel>
+      <InputLabel id="interval-label">Time Interval (minutes)</InputLabel>
       <Select
-        value={minutes}
+        labelId="interval-label"
+        value={interval}
         label="Time Interval (minutes)"
-        onChange={(e) => setMinutes(e.target.value)}
+        onChange={handleChange}
       >
-        {[5, 10, 30, 60, 120].map((val) => (
-          <MenuItem key={val} value={val}>{val}</MenuItem>
-        ))}
+        <MenuItem value={5}>5</MenuItem>
+        <MenuItem value={10}>10</MenuItem>
+        <MenuItem value={15}>15</MenuItem>
+        <MenuItem value={30}>30</MenuItem>
+        <MenuItem value={60}>60</MenuItem>
       </Select>
     </FormControl>
   );
 }
+
+export default TimeSelector;

@@ -1,18 +1,30 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Typography } from '@mui/material';
+import React from 'react';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
 
-export default function StockChart({ data, average }) {
-  return (
-    <>
-      <Typography variant="h6" align="center" mt={2}>Stock Price Chart</Typography>
-      <LineChart width={800} height={400} data={data}>
-        <XAxis dataKey="lastUpdatedAt" />
-        <YAxis />
-        <Tooltip />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Line type="monotone" dataKey="price" stroke="#1976d2" />
-        <ReferenceLine y={average} label="Avg" stroke="red" strokeDasharray="3 3" />
-      </LineChart>
-    </>
-  );
-}
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+
+const StockChart = ({ data, average }) => {
+  const chartData = {
+    labels: data.map((entry) => new Date(entry.lastUpdatedAt).toLocaleTimeString()),
+    datasets: [
+      {
+        label: 'Price',
+        data: data.map((entry) => entry.price),
+        borderColor: 'blue',
+        fill: false,
+      },
+      {
+        label: 'Average',
+        data: data.map(() => average),
+        borderColor: 'red',
+        borderDash: [5, 5],
+        fill: false,
+      },
+    ],
+  };
+
+  return <Line data={chartData} />;
+};
+
+export default StockChart;
